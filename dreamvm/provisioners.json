@@ -1,0 +1,106 @@
+{
+  "provisioners": [
+    {
+      "binary": false,
+      "execute_command": "echo '{{user `ssh_password`}}' | {{.Vars}} sudo -E -S '{{.Path}}'",
+      "expect_disconnect": true,
+      "inline": [
+        "apt-get install -y cu dnsmasq dnsutils firmware-adi firmware-linux git iputils-arping minicom mgetty netsed ntp ppp python-netifaces python-pip python-serial python-sh resolvconf vim wvdial",
+        "pip install python-iptables",
+        "mkdir -p /usr/local/lib/dreampi",
+        "chmod 0755 /usr/local/lib/dreampi",
+        "git clone git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git /usr/local/src/linux-firmware",
+        "mkdir -p /lib/firmware/keyspan",
+        "cp -Rv /usr/local/src/linux-firmware/keyspan/*.fw /lib/firmware/keyspan",
+        "chmod 0755 /lib/firmware/keyspan",
+        "chmod 0644 /lib/firmware/keyspan/*.fw"
+      ],
+      "inline_shebang": "/bin/sh -e",
+      "only": [
+        "virtualbox",
+        "qemu"
+      ],
+      "skip_clean": false,
+      "start_retry_timeout": "{{user `start_retry_timeout`}}",
+      "type": "shell"
+    },
+    {
+      "type": "file",
+      "source": "dreampi.py",
+      "destination": "/tmp/dreampi.py",
+      "only": [
+        "virtualbox",
+        "qemu"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "dcnow.py",
+      "destination": "/tmp/dcnow.py",
+      "only": [
+        "virtualbox",
+        "qemu"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "dial-tone.wav",
+      "destination": "/tmp/dial-tone.wav",
+      "only": [
+        "virtualbox",
+        "qemu"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "config_server.py",
+      "destination": "/tmp/config_server.py",
+      "only": [
+        "virtualbox",
+        "qemu"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "etc/dnsmasq.conf",
+      "destination": "/tmp/dnsmasq.conf",
+      "only": [
+        "virtualbox",
+        "qemu"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "etc/init.d/dreampi",
+      "destination": "/tmp/dreampi",
+      "only": [
+        "virtualbox",
+        "qemu"
+      ]
+    },
+    {
+      "binary": false,
+      "execute_command": "echo '{{user `ssh_password`}}' | {{.Vars}} sudo -E -S '{{.Path}}'",
+      "expect_disconnect": true,
+      "inline": [
+        "install -v -o root -g root -m 0644 /tmp/dial-tone.wav /usr/local/lib/dreampi/dial-tone.wav",
+        "install -v -o root -g root -m 0755 /tmp/dreampi.py /usr/local/lib/dreampi/dreampi.py",
+        "install -v -o root -g root -m 0755 /tmp/dcnow.py /usr/local/lib/dreampi/dcnow.py",
+        "install -v -o root -g root -m 0755 /tmp/config_server.py /usr/local/lib/dreampi/config_server.py",
+        "install -v -o root -g root -m 0755 /tmp/dreampi /etc/init.d/dreampi",
+        "install -v -o root -g root -m 0644 /tmp/dnsmasq.conf /etc/dnsmasq.conf",
+        "rm -rv /tmp/dial-tone.wav /tmp/dreampi.py /tmp/dcnow.py /tmp/config_server.py /tmp/dreampi /tmp/dnsmasq.conf",
+        "ln -s /usr/local/lib/dreampi/dreampi.py /usr/local/bin/dreampi",
+        "update-rc.d dreampi defaults"
+      ],
+      "inline_shebang": "/bin/sh -e",
+      "only": [
+        "virtualbox",
+        "qemu"
+      ],
+      "skip_clean": false,
+      "start_retry_timeout": "{{user `start_retry_timeout`}}",
+      "type": "shell"
+    }
+  ]
+}
