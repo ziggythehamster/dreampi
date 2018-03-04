@@ -20,8 +20,10 @@ UPDATE_END_POINT = "/api/update/{mac_address}/"
 
 UPDATE_INTERVAL = 15
 
-CONFIGURATION_FILE = os.path.expanduser("~/.dreampi.json")
-
+if os.getuid() == 0:
+    CONFIGURATION_FILE = "/usr/local/etc/dreampi.json"
+else:
+    CONFIGURATION_FILE = os.path.expanduser("~/.dreampi.json")
 
 def scan_mac_address():
     mac = get_mac()
