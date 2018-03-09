@@ -321,6 +321,10 @@ class Modem(object):
     def device_name(self):
         return self._device
 
+    @property
+    def dial_tone_enabled(self):
+        return self._dial_tone_wav is not None
+
     def _read_dial_tone(self):
         this_dir = os.path.dirname(os.path.abspath(os.path.realpath(__file__)))
         dial_tone_wav = os.path.join(this_dir, "dial-tone.wav")
