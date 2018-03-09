@@ -308,6 +308,7 @@ class Modem(object):
             self._dial_tone_wav = self._read_dial_tone()
         else:
             self._dial_tone_wav = None
+        self._last_response = None
 
         self._time_since_last_dial_tone = None
         self._dial_tone_counter = 0
@@ -380,11 +381,14 @@ class Modem(object):
         logger.info("Connected")
 
     def send_command(self, command, timeout=60):
-        VALID_RESPONSES = ("OK", "ERROR", "CONNECT", "VCON")
+        # reset the last response
+        self._last_response = None
 
-        final_command = "%s\r\n" % command
-        self._serial.write(final_command)
-        logger.info(final_command)
+        VALID_RESPONSES = ("OK", "ERROR", "CONNECT", "VCON", "NO CARRIER")
+
+        # Send the command
+        self._serial.write("%s\r\n" % command)
+        logger.info("Sending command: [%s]" % command)
 
         start = datetime.now()
 
@@ -398,7 +402,8 @@ class Modem(object):
             line = line + new_data
             for resp in VALID_RESPONSES:
                 if resp in line:
-                    logger.info(line[line.find(resp):])
+                    self._last_response = resp
+                    logger.info("Received response: [%s]" % line[line.find(resp):])
                     return # We are done
 
             if (datetime.now() - start).total_seconds() > timeout:
