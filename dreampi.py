@@ -372,6 +372,28 @@ class Modem(object):
         self.reset() #Reset the modem
         self._sending_tone = False
 
+    # Voice modems support FCLASS=8, but others will return an error
+    def check_voice_capability(self):
+        if not self._serial:
+            return
+
+        logger.info("Checking if your modem is a voice modem...")
+
+        self.reset()
+        self.send_command("AT+FCLASS=8")
+
+        if self._last_response == "OK":
+            logger.info("Your modem supports voice mode. Blind dialing is not required as DreamPi will generate a dial tone.")
+            self._dial_tone_wav = self._read_dial_tone()
+            return
+        elif self._last_response == "ERROR":
+            logger.info("Your modem does not support voice mode. Blind dialing will be required as DreamPi cannot generate a dial tone.")
+            self._dial_tone_wav = None
+            return
+
+        logger.info("Your modem did not respond as expected - voice mode will not be used. Blind dialing will be required as DreamPi cannot generate a dial tone.")
+        self._dial_tone_wav = None
+
     def answer(self):
         self.reset()
         self.send_command("ATA")
