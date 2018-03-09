@@ -519,6 +519,10 @@ def process():
                     logger.info("Detected modem hang up, going back to listening")
                     time.sleep(5) # Give the hangup some time
                     break
+                elif "Connection terminated" in line:
+                    logger.info("Detected a terminated connection, going back to listening")
+                    time.sleep(5) # same as above
+                    break
 
             dcnow.go_offline()
 
