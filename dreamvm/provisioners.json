@@ -9,7 +9,7 @@
         "pip install python-iptables",
         "mkdir -p /usr/local/lib/dreampi",
         "chmod 0755 /usr/local/lib/dreampi",
-        "git clone git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git /usr/local/src/linux-firmware",
+        "git clone --depth 1 git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git /usr/local/src/linux-firmware",
         "mkdir -p /lib/firmware/keyspan",
         "cp -Rv /usr/local/src/linux-firmware/keyspan/*.fw /lib/firmware/keyspan",
         "chmod 0755 /lib/firmware/keyspan",
