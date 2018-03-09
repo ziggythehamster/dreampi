@@ -300,14 +300,11 @@ class Daemon(object):
 class Modem(object):
     def __init__(self, device, speed, comm_speed=None, send_dial_tone=True):
         self._device, self._speed = device, speed
+        self._dial_tone_wav = None
+        self._enable_dial_tone_if_possible = send_dial_tone
         self._comm_speed = comm_speed or self._speed
         self._serial = None
         self._sending_tone = False
-
-        if send_dial_tone:
-            self._dial_tone_wav = self._read_dial_tone()
-        else:
-            self._dial_tone_wav = None
         self._last_response = None
 
         self._time_since_last_dial_tone = None
@@ -380,6 +377,11 @@ class Modem(object):
     # Voice modems support FCLASS=8, but others will return an error
     def check_voice_capability(self):
         if not self._serial:
+            return
+
+        if not self._enable_dial_tone_if_possible:
+            logger.info("You passed the --disable-dial-tone argument. We will not autodetect if your modem supports voice mode.")
+            self._dial_tone_wav = None
             return
 
         logger.info("Checking if your modem is a voice modem...")
@@ -503,9 +505,10 @@ def process():
 
     mode = "LISTENING"
 
+    # Connect and then check if the modem supports voice mode.
     modem.connect()
-    if dial_tone_enabled:
-        modem.start_dial_tone()
+    modem.check_voice_capability()
+    modem.start_dial_tone()
 
     time_digit_heard = None
 
@@ -561,8 +564,7 @@ def process():
             mode = "LISTENING"
             modem = Modem(device_and_speed[0], device_and_speed[1], BAUD_SPEED, dial_tone_enabled)
             modem.connect()
-            if dial_tone_enabled:
-                modem.start_dial_tone()
+            modem.start_dial_tone()
 
     return 0
 
