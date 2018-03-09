@@ -67,9 +67,9 @@ def start_afo_patching():
     rule.dst = "63.251.242.131"
     rule.create_target("DNAT")
     rule.target.to_destination = replacement
-    
+
     chain.append_rule(rule)
-    
+
     afo_patcher = rule
     logger.info("AFO routing enabled")
 
@@ -85,8 +85,8 @@ def stop_afo_patching():
 def start_process(name):
     try:
         logger.info("Starting {} process - Thanks Jonas Karlsson!".format(name))
-        with open(os.devnull, 'wb') as devnull:    
-            subprocess.check_call(["sudo", "service", name, "start"], stdout=devnull)    
+        with open(os.devnull, 'wb') as devnull:
+            subprocess.check_call(["sudo", "service", name, "start"], stdout=devnull)
     except (subprocess.CalledProcessError, IOError):
         logging.warning("Unable to start the {} process".format(name))
 
@@ -97,7 +97,7 @@ def stop_process(name):
         with open(os.devnull, 'wb') as devnull:
             subprocess.check_call(["sudo", "service", name, "stop"], stdout=devnull)
     except (subprocess.CalledProcessError, IOError):
-        logging.warning("Unable to stop the {} process".format(name))    
+        logging.warning("Unable to stop the {} process".format(name))
 
 
 def get_default_iface_name_linux():
@@ -548,9 +548,9 @@ def main():
         return 1
     finally:
         stop_process("dcgamespy")
-        stop_process("dcvoip")        
+        stop_process("dcvoip")
         stop_afo_patching()
-        
+
         config_server.stop()
         logger.info("Dreampi quit successfully")
 
