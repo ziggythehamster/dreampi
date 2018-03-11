@@ -38,31 +38,59 @@ rpi? = Build an image compatible with the Raspberry Pi
 rpi:
 	$(error Sorry, this is not yet supported.)
 
-# This builds an amd64 VirtualBox image.
-vbox-amd64? = Build a VirtualBox image compatible with AMD64/x86_64 processors. Windows users: Hyper-V must be disabled or VirtualBox cannot build this image.
-vbox-amd64:
-	# Amend the packer template with additional provisioners
-	cat ./vendor/packer-build/debian/jessie/base.json ./dreamvm/provisioners.json | jq -rs ".[0].provisioners = .[1].provisioners + .[0].provisioners | .[0]" > ./tmp/vbox-amd64.json
+# This builds a VirtualBox image. We have to do some stuff to the upstream Packer
+# template to make it work for us, but that's done with jq rather than keeping a
+# copy of the template in the repo. Also, we build an x86 image because many crappy
+# WinModems only have x86 drivers available and because users running Hyper-V (whether
+# they realize it or not) will not be able to run a 64-bit OS in VirtualBox
+vbox:
+	# Amend the packer template
+	cat ./vendor/packer-build/debian/jessie/base.json ./dreamvm/provisioners.json | \
+	sed 's/install\.amd/install\.386/' | \
+	jq -rs "\
+		.[0].provisioners = .[1].provisioners + .[0].provisioners | \
+		del(.[0][\"post-processors\"][0, 3]) | \
+		.[0].builders[0].guest_os_type = \"Debian\" | \
+		.[0].builders[0].export_opts = [ \
+			\"--options\", \"manifest,nomacs\", \
+			\"--vsys\", \"0\", \
+			\"--product\", \"DreamVM\", \
+			\"--version\", \"$(VERSION)\", \
+			\"--description\", \"{{user \`description\`}}\" \
+		] | \
+		.[0].builders[0].vboxmanage = .[0].builders[0].vboxmanage + [ \
+			[ \
+				\"modifyvm\", \
+				\"{{.Name}}\", \
+				\"--vram\", \
+				\"64\" \
+			], \
+			[ \
+				\"modifyvm\", \
+				\"{{.Name}}\", \
+				\"--usb\", \
+				\"on\" \
+			] \
+		] | \
+		.[0]" > ./tmp/vbox.json
 
 	# Set the description field to something including spaces because space-escaping is not working properly
-	jq -rn '{ description: "DreamVM $(VERSION) for AMD64/x86_64" }' > ./tmp/vbox-amd64-vars.json
+	jq -rn '{ description: "DreamVM $(VERSION)" }' > ./tmp/vbox-vars.json
 
 	# Build the image
 	$(PACKER_BUILD_VBOX) \
-		-var-file ./tmp/vbox-amd64-vars.json \
+		-var-file ./tmp/vbox-vars.json \
 		-var 'country=US' \
 		-var 'headless=$(HEADLESS)' \
+		-var 'iso_checksum=d60ba9bf74ca3db95cb57bf7524d39487f541d28ba403a238996b9b4dca1b9103a0c0c82379d7c68b506cff589845b73bf0497311dd549b6854e21cddd03a8f8' \
+		-var 'iso_file=debian-8.10.0-i386-netinst.iso' \
+		-var 'iso_path_external=http://cdimage.debian.org/cdimage/archive/latest-oldstable/i386/iso-cd' \
 		-var 'locale=en_US.UTF-8' \
-		-var 'preseed_file=dreamvm/amd64.preseed' \
+		-var 'preseed_file=dreamvm.preseed' \
 		-var 'ssh_password=dreamvm' \
 		-var 'ssh_username=dreamvm' \
 		-var 'vagrantfile_template=vendor/packer-build/debian/jessie/base.vagrant' \
-		-var 'vm_name=dreamvm-amd64-$(shell echo '$(VERSION)' | tr . -)' \
-		./tmp/vbox-amd64.json
+		-var 'vm_name=dreamvm-$(shell echo '$(VERSION)' | tr . -)' \
+		./tmp/vbox.json
 
-# This builds an x86 VirtualBox image.
-vbox-x86? = Build a VirtualBox image compatible with x86 processors (also runs on AMD64/x86_64 processors).
-vbox-x86:
-	$(error Sorry, this is not yet supported.)
-
-.PHONY: default preflight rpi vbox-amd64 vbox-x86
+.PHONY: default preflight rpi vbox
