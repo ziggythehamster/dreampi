@@ -17,6 +17,7 @@ import urllib
 import iptc
 
 from dcnow import DreamcastNowService
+from dte_baud_rate_detector import DTEBaudRateDetector
 
 from datetime import datetime, timedelta
 
