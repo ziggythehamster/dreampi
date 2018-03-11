@@ -299,6 +299,33 @@ class Daemon(object):
 
 class Modem(object):
     def __init__(self, device, speed, comm_speed=None, send_dial_tone=True):
+        """
+            Initializes the Modem object.
+
+            Parameters
+            ----------
+            device : str
+                The serial port (e.g., `ttyACM0`, `ttyS0`)
+            speed : int
+                The DTE baud rate detected by `wvdialconf`.
+                This is likely the highest supported baud
+                rate, but many modems claim to support a
+                particular DTE baud rate but don't actually
+                work properly at that baud rate.
+            comm_speed : int, optional
+                The baud rate detected by DTEBaudRateDetector.
+                This is the baud rate actually used, unless
+                you don't pass a baud rate, in which case
+                the `wvdialconf` detected baud rate is used.
+            send_dial_tone : bool, optional
+                Whether or not to send a dial tone if the
+                modem supports it. The default is to send
+                a dial tone if possible. You need to call
+                `check_voice_capability` to actually set up
+                this class so that sending a dial tone is
+                possible.
+
+        """
         self._device, self._speed = device, speed
         self._dial_tone_wav = None
         self._enable_dial_tone_if_possible = send_dial_tone
