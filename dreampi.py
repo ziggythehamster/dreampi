@@ -506,8 +506,6 @@ def process():
     with open(os.devnull, 'wb') as devnull:
         subprocess.call(["sudo", "killall", "pppd"], stderr=devnull)
 
-    BAUD_SPEED = 56000
-
     device_and_speed, internet_connected = None, False
 
     ## Startup checks, make sure that we don't do anything until
@@ -528,7 +526,12 @@ def process():
 
         time.sleep(5)
 
-    modem = Modem(device_and_speed[0], device_and_speed[1], BAUD_SPEED, dial_tone_enabled)
+    # Detect the baud rate
+    detector = DTEBaudRateDetector(device_and_speed[0], logger)
+    baud_rate = detector.supported_baud_rate()
+
+    # Initialize the modem
+    modem = Modem(device_and_speed[0], device_and_speed[1], baud_rate, dial_tone_enabled)
     dreamcast_ip = autoconfigure_ppp(modem.device_name, modem.device_speed)
 
     mode = "LISTENING"
@@ -590,7 +593,7 @@ def process():
             dcnow.go_offline()
 
             mode = "LISTENING"
-            modem = Modem(device_and_speed[0], device_and_speed[1], BAUD_SPEED, dial_tone_enabled)
+            modem = Modem(device_and_speed[0], device_and_speed[1], baud_rate, dial_tone_enabled)
             modem.connect()
             modem.start_dial_tone()
 
