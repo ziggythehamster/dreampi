@@ -5,7 +5,7 @@
       "execute_command": "echo '{{user `ssh_password`}}' | {{.Vars}} sudo -E -S '{{.Path}}'",
       "expect_disconnect": true,
       "inline": [
-        "apt-get install -y cu dnsmasq dnsutils firmware-adi firmware-linux git iputils-arping minicom mgetty netsed ntp ppp python-netifaces python-pip python-serial python-sh resolvconf socat sl-modem-dkms usb-modeswitch usbutils vim wvdial",
+        "apt-get install -y cu dnsmasq dnsutils firmware-adi firmware-linux git iputils-arping libnetfilter-queue-dev minicom mgetty netsed ntp ppp python-netifaces python-pip python-serial python-sh resolvconf socat sl-modem-dkms usb-modeswitch usbutils vim wvdial",
         "pip install python-iptables",
         "mkdir -p /usr/local/lib/dreampi",
         "chmod 0755 /usr/local/lib/dreampi",
