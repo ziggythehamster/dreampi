@@ -432,7 +432,24 @@ class Modem(object):
 
     def answer(self):
         self.reset()
-        self.send_command("ATA")
+
+        # FIXME: This is an infinite loop if we never are able to answer a call.
+        # This might happen if we take too long to switch from playing the dial tone to answering the call.
+        # We should probably only retry a few times, throw an exception, and then catch it in the main handler.
+        while True:
+            logger.info("Attempting to answer the call...")
+            self.send_command("ATA") # answer the call
+
+            if self._last_response == "CONNECT":
+                logger.info("Modem connected, waiting 5 seconds to pass off to pppd...")
+                break
+
+            logger.info("Answering failed: '%s'" % self._last_response)
+            logger.info("Retrying in 1 second...")
+
+            time.sleep(1)
+            self.send_command("ATH")
+
         time.sleep(5)
         logger.info("Call answered!")
         logger.info(subprocess.check_output(["pon", "dreamcast"]))
@@ -549,27 +566,37 @@ def process():
     while True:
         if killer.kill_now:
             break
-    
+
         now = datetime.now()
 
         if mode == "LISTENING":
-            modem.update()
-            char = modem._serial.read(1).strip()
-            if not char:
-                continue
+            if modem.dial_tone_enabled:
+                # this check only works for voice modems
+                modem.update()
+                char = modem._serial.read(1).strip()
+                if not char:
+                    continue
 
-            if ord(char) == 16:
-                #DLE character
-                try:
-                    char = modem._serial.read(1)
-                    digit = int(char)
-                    logger.info("Heard: %s", digit)
+                if ord(char) == 16:
+                    #DLE character
+                    try:
+                        char = modem._serial.read(1)
+                        digit = int(char)
+                        logger.info("Heard: %s", digit)
 
-                    mode = "ANSWERING"
-                    modem.stop_dial_tone()
-                    time_digit_heard = now
-                except (TypeError, ValueError):
-                    pass
+                        mode = "ANSWERING"
+                        modem.stop_dial_tone()
+                        time_digit_heard = now
+                    except (TypeError, ValueError):
+                        pass
+            else:
+                # data-only modems basically just need to sit in ATA for a long time.
+                # they will respond back with NO CARRIER if they sit too long.
+                # no carrier is handled elsewhere.
+                # let's switch to answering mode since listening is impossible.
+                time_digit_heard = now
+                mode = "ANSWERING"
+
         elif mode == "ANSWERING":
             if (now - time_digit_heard).total_seconds() > 8.0:
                 time_digit_heard = None
