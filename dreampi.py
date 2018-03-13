@@ -18,6 +18,7 @@ import iptc
 
 from dcnow import DreamcastNowService
 from dte_baud_rate_detector import DTEBaudRateDetector
+from port_forwarding import PortForwarding
 
 from datetime import datetime, timedelta
 
@@ -552,6 +553,9 @@ def process():
     modem = Modem(device_and_speed[0], device_and_speed[1], baud_rate, dial_tone_enabled)
     dreamcast_ip = autoconfigure_ppp(modem.device_name, modem.device_speed)
 
+    # Get a port forwarding object, now that we know the DC IP.
+    port_forwarding = PortForwarding(dreamcast_ip, logger)
+
     mode = "LISTENING"
 
     # Connect and then check if the modem supports voice mode.
@@ -606,6 +610,7 @@ def process():
 
         elif mode == "CONNECTED":
             dcnow.go_online(dreamcast_ip)
+            port_forwarding.forward_all()
 
             # We start watching /var/log/messages for the hang up message
             for line in sh.tail("-f", "/var/log/messages", "-n", "1", _iter=True):
@@ -618,6 +623,7 @@ def process():
                     time.sleep(5) # same as above
                     break
 
+            port_forwarding.delete_all()
             dcnow.go_offline()
 
             mode = "LISTENING"
