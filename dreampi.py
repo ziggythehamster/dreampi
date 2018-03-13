@@ -378,7 +378,7 @@ class Modem(object):
         self.send_command("ATZ0") # Send reset command
         self.send_command("ATE0") # Don't echo our responses
         self.send_command("ATL3") # Maximum speaker volume
-        self.send_command("ATS7=45") # fail faster while waiting for a carrier
+        self.send_command("ATS7=31") # fail faster while waiting for a carrier
 
     def start_dial_tone(self):
         if not self._dial_tone_wav:
