@@ -5,7 +5,7 @@ PACKER_BUILD_VBOX = ./vendor/packer-build/scripts/vbox.sh
 
 # Variables
 HEADLESS = true
-VERSION  = 1.6
+VERSION  = $(shell cat dreampi-version.txt)
 
 # Set the default target to help
 MAIN = help
