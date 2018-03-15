@@ -11,7 +11,7 @@ class PortForwarding:
     # List of ports and the game they're for
     PORTS = [
         (1028,  'UDP', 'Planet Ring'),
-        (1285,  'UDP', 'Planet Ring'),
+        (1285,  'UDP', 'Planet Ring / Dreamcast VoIP'),
         (3512,  'TCP', 'The Next Tetris: Online Edition'),
         (3512,  'UDP', 'The Next Tetris: Online Edition'),
         (6001,  'UDP', 'Ooga Booga'),
