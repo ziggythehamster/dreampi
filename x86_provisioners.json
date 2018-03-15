@@ -5,7 +5,7 @@
       "execute_command": "echo '{{user `ssh_password`}}' | {{.Vars}} sudo -E -S '{{.Path}}'",
       "expect_disconnect": true,
       "inline": [
-        "apt-get install -y cu dnsmasq dnsutils firmware-adi firmware-linux git iputils-arping libnetfilter-queue-dev minicom mgetty netsed ntp ppp python-netifaces python-pip python-serial python-sh resolvconf socat sl-modem-dkms usb-modeswitch usbutils vim wvdial",
+        "apt-get install -y cu dnsmasq dnsutils firmware-adi firmware-linux git iputils-arping libnetfilter-queue-dev minicom mgetty netsed ntp ppp p7zip-full python-miniupnpc python-netifaces python-pip python-serial python-sh resolvconf socat sl-modem-dkms usb-modeswitch usbutils vim wvdial",
         "pip install python-iptables",
         "mkdir -p /usr/local/lib/dreampi",
         "chmod 0755 /usr/local/lib/dreampi",
@@ -79,10 +79,38 @@
       ]
     },
     {
+      "type": "file",
+      "source": "vendor/dcgamespy/x86/dcgamespy_1.0.zip",
+      "destination": "/tmp/dcgamespy.zip",
+      "only": [
+        "virtualbox",
+        "qemu"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "vendor/dcvoip/x86/dcvoip_1.0.zip",
+      "destination": "/tmp/dcvoip.zip",
+      "only": [
+        "virtualbox",
+        "qemu"
+      ]
+    },
+    {
       "binary": false,
       "execute_command": "echo '{{user `ssh_password`}}' | {{.Vars}} sudo -E -S '{{.Path}}'",
       "expect_disconnect": true,
       "inline": [
+        "mkdir /tmp/dcgamespy /tmp/dcvoip",
+        "7z x /tmp/dcgamespy.zip -o/tmp/dcgamespy",
+        "7z x /tmp/dcvoip.zip -o/tmp/dcvoip",
+        "install -v -o root -g root -m 0755 -d /usr/share/doc/dcgamespy /usr/share/doc/dcvoip",
+        "install -v -o root -g root -m 0644 /tmp/dcgamespy/x86/usr/share/doc/dcgamespy/copyright /usr/share/doc/dcgamespy/copyright",
+        "install -v -o root -g root -m 0755 /tmp/dcgamespy/x86/etc/init.d/dcgamespy /etc/init.d/dcgamespy",
+        "install -v -o root -g root -m 0755 /tmp/dcgamespy/x86/usr/bin/dcgamespy /usr/bin/dcgamespy",
+        "install -v -o root -g root -m 0644 /tmp/dcvoip/x86/usr/share/doc/dcvoip/copyright /usr/share/doc/dcvoip/copyright",
+        "install -v -o root -g root -m 0755 /tmp/dcvoip/x86/etc/init.d/dcvoip /etc/init.d/dcvoip",
+        "install -v -o root -g root -m 0755 /tmp/dcvoip/x86/usr/bin/dcvoip /usr/bin/dcvoip",
         "install -v -o root -g root -m 0644 /tmp/dial-tone.wav /usr/local/lib/dreampi/dial-tone.wav",
         "install -v -o root -g root -m 0755 /tmp/dreampi.py /usr/local/lib/dreampi/dreampi.py",
         "install -v -o root -g root -m 0755 /tmp/dcnow.py /usr/local/lib/dreampi/dcnow.py",
@@ -90,8 +118,11 @@
         "install -v -o root -g root -m 0755 /tmp/dreampi /etc/init.d/dreampi",
         "install -v -o root -g root -m 0644 /tmp/dnsmasq.conf /etc/dnsmasq.conf",
         "rm -rv /tmp/dial-tone.wav /tmp/dreampi.py /tmp/dcnow.py /tmp/config_server.py /tmp/dreampi /tmp/dnsmasq.conf",
+        "rm -rfv /tmp/dcgamespy /tmp/dcvoip",
         "ln -s /usr/local/lib/dreampi/dreampi.py /usr/local/bin/dreampi",
-        "update-rc.d dreampi defaults"
+        "update-rc.d dreampi defaults",
+        "update-rc.d dcgamespy defaults",
+        "update-rc.d dcvoip defaults"
       ],
       "inline_shebang": "/bin/sh -e",
       "only": [
