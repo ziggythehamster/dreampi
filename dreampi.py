@@ -553,8 +553,9 @@ def process():
     modem = Modem(device_and_speed[0], device_and_speed[1], baud_rate, dial_tone_enabled)
     dreamcast_ip = autoconfigure_ppp(modem.device_name, modem.device_speed)
 
-    # Get a port forwarding object, now that we know the DC IP.
+    # Get a port forwarding object, now that we know the DC IP. Then, set up all forwards.
     port_forwarding = PortForwarding(dreamcast_ip, logger)
+    port_forwarding.forward_all()
 
     mode = "LISTENING"
 
@@ -610,7 +611,6 @@ def process():
 
         elif mode == "CONNECTED":
             dcnow.go_online(dreamcast_ip)
-            port_forwarding.forward_all()
 
             # We start watching /var/log/messages for the hang up message
             for line in sh.tail("-f", "/var/log/messages", "-n", "1", _iter=True):
@@ -623,7 +623,6 @@ def process():
                     time.sleep(5) # same as above
                     break
 
-            port_forwarding.delete_all()
             dcnow.go_offline()
 
             mode = "LISTENING"
@@ -631,6 +630,8 @@ def process():
             modem.connect()
             modem.start_dial_tone()
 
+    # Cleanup now that we're shutting down
+    port_forwarding.delete_all()
     return 0
 
 
