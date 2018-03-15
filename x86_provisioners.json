@@ -62,6 +62,24 @@
     },
     {
       "type": "file",
+      "source": "dte_baud_rate_detector.py",
+      "destination": "/tmp/dte_baud_rate_detector.py",
+      "only": [
+        "virtualbox",
+        "qemu"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "port_forwarding.py",
+      "destination": "/tmp/port_forwarding.py",
+      "only": [
+        "virtualbox",
+        "qemu"
+      ]
+    },
+    {
+      "type": "file",
       "source": "etc/dnsmasq.conf",
       "destination": "/tmp/dnsmasq.conf",
       "only": [
@@ -111,13 +129,15 @@
         "install -v -o root -g root -m 0644 /tmp/dcvoip/x86/usr/share/doc/dcvoip/copyright /usr/share/doc/dcvoip/copyright",
         "install -v -o root -g root -m 0755 /tmp/dcvoip/x86/etc/init.d/dcvoip /etc/init.d/dcvoip",
         "install -v -o root -g root -m 0755 /tmp/dcvoip/x86/usr/bin/dcvoip /usr/bin/dcvoip",
+        "install -v -o root -g root -m 0755 /tmp/config_server.py /usr/local/lib/dreampi/config_server.py",
+        "install -v -o root -g root -m 0755 /tmp/dcnow.py /usr/local/lib/dreampi/dcnow.py",
         "install -v -o root -g root -m 0644 /tmp/dial-tone.wav /usr/local/lib/dreampi/dial-tone.wav",
         "install -v -o root -g root -m 0755 /tmp/dreampi.py /usr/local/lib/dreampi/dreampi.py",
-        "install -v -o root -g root -m 0755 /tmp/dcnow.py /usr/local/lib/dreampi/dcnow.py",
-        "install -v -o root -g root -m 0755 /tmp/config_server.py /usr/local/lib/dreampi/config_server.py",
+        "install -v -o root -g root -m 0755 /tmp/dte_baud_rate_detector.py /usr/local/lib/dreampi/dte_baud_rate_detector.py",
+        "install -v -o root -g root -m 0755 /tmp/port_forwarding.py /usr/local/lib/dreampi/port_forwarding.py",
         "install -v -o root -g root -m 0755 /tmp/dreampi /etc/init.d/dreampi",
         "install -v -o root -g root -m 0644 /tmp/dnsmasq.conf /etc/dnsmasq.conf",
-        "rm -rv /tmp/dial-tone.wav /tmp/dreampi.py /tmp/dcnow.py /tmp/config_server.py /tmp/dreampi /tmp/dnsmasq.conf",
+        "rm -rv /tmp/dial-tone.wav /tmp/dreampi.py /tmp/dcnow.py /tmp/config_server.py /tmp/dreampi /tmp/dnsmasq.conf /tmp/dte_baud_rate_detector.py /tmp/port_forwarding.py",
         "rm -rfv /tmp/dcgamespy /tmp/dcvoip",
         "ln -s /usr/local/lib/dreampi/dreampi.py /usr/local/bin/dreampi",
         "update-rc.d dreampi defaults",
