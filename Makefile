@@ -45,7 +45,7 @@ rpi:
 # they realize it or not) will not be able to run a 64-bit OS in VirtualBox
 vbox:
 	# Amend the packer template
-	cat ./vendor/packer-build/debian/jessie/base.json ./dreamvm/provisioners.json | \
+	cat ./vendor/packer-build/debian/jessie/base.json ./x86_provisioners.json | \
 	sed 's/install\.amd/install\.386/' | \
 	jq -rs "\
 		.[0].provisioners = .[1].provisioners + .[0].provisioners | \
