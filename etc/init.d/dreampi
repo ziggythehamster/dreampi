@@ -3,8 +3,8 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 
 ### BEGIN INIT INFO
 # Provides:          dreampi
-# Required-Start:    $network
-# Required-Stop:     
+# Required-Start:    $network dnsmasq
+# Required-Stop:
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Dreampi Dreamcast Internet Server
