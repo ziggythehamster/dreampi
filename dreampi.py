@@ -101,6 +101,17 @@ def stop_process(name):
     except (subprocess.CalledProcessError, IOError):
         logger.warn("Unable to stop the {} process".format(name))
 
+def restart_service(name):
+    """Restarts the service passed in"""
+
+    try:
+        logger.info("Restarting {} service".format(name))
+
+        with open(os.devnull, 'wb') as devnull:
+            subprocess.check_call(["sudo", "service", name, "restart"], stdout=devnull)
+    except (subprocess.CalledProcessError, IOError):
+        logger.warn("Unable to restart the {} service".format(name))
+
 
 def get_default_iface_name_linux():
     route = "/proc/net/route"
@@ -454,6 +465,7 @@ class Modem(object):
         time.sleep(5)
         logger.info("Call answered!")
         logger.info(subprocess.check_output(["pon", "dreamcast"]))
+        restart_service("dnsmasq") # restart dnsmasq so it knows about the ppp0 interface
         logger.info("Connected")
 
     def send_command(self, command, timeout=60):
