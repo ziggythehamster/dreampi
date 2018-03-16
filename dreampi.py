@@ -90,7 +90,7 @@ def start_process(name):
         with open(os.devnull, 'wb') as devnull:
             subprocess.check_call(["sudo", "service", name, "start"], stdout=devnull)
     except (subprocess.CalledProcessError, IOError):
-        logging.warning("Unable to start the {} process".format(name))
+        logger.warn("Unable to start the {} process".format(name))
 
 
 def stop_process(name):
@@ -99,7 +99,7 @@ def stop_process(name):
         with open(os.devnull, 'wb') as devnull:
             subprocess.check_call(["sudo", "service", name, "stop"], stdout=devnull)
     except (subprocess.CalledProcessError, IOError):
-        logging.warning("Unable to stop the {} process".format(name))
+        logger.warn("Unable to stop the {} process".format(name))
 
 
 def get_default_iface_name_linux():
