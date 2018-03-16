@@ -17,8 +17,7 @@ help:
 	@echo ""
 	@echo $$'\x1b[1m\x1b[4mImage building targets:\x1b[0m'
 	@echo "    rpi                $(rpi?)"
-	@echo "    vbox-amd64         $(vbox-amd64?)"
-	@echo "    vbox-x86           $(vbox-x86?)"
+	@echo "    vbox               $(vbox?)"
 	@echo ""
 	@echo $$'\x1b[1m\x1b[4mTool targets:\x1b[0m'
 	@echo "    preflight          $(preflight?)"
@@ -43,6 +42,7 @@ rpi:
 # copy of the template in the repo. Also, we build an x86 image because many crappy
 # WinModems only have x86 drivers available and because users running Hyper-V (whether
 # they realize it or not) will not be able to run a 64-bit OS in VirtualBox
+vbox? = Build an image compatible with VirtualBox
 vbox:
 	# Amend the packer template
 	cat ./vendor/packer-build/debian/jessie/base.json ./x86_provisioners.json | \
